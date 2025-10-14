@@ -52,11 +52,52 @@ npm run dev
 
 ## Environment Variables
 
+### AI Providers (Required)
+
 ```env
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
-GOOGLE_API_KEY=your_google_api_key_here
+GOOGLE_AI_API_KEY=your_google_ai_api_key_here
 ```
+
+- **Anthropic API Key**: For Claude AI models - Get it from [Anthropic Console](https://console.anthropic.com/)
+- **OpenAI API Key**: For GPT-4 models - Get it from [OpenAI Platform](https://platform.openai.com/api-keys)
+- **Google AI API Key**: For Gemini models - Get it from [Google AI Studio](https://makersuite.google.com/app/apikey)
+
+### Research APIs (Optional)
+
+These APIs enhance ad generation with real-time research capabilities:
+
+```env
+FIRECRAWL_API_KEY=your_firecrawl_api_key_here
+SERP_API_KEY=your_serp_api_key_here
+JINA_API_KEY=your_jina_api_key_here
+```
+
+- **Firecrawl API**: Web scraping and content extraction for analyzing competitor ads and landing pages
+  - Get it from [Firecrawl](https://www.firecrawl.dev/)
+  - Use case: Extract content from URLs to understand market positioning
+
+- **SERP API**: Search engine results for researching trending topics and keywords
+  - Get it from [SerpAPI](https://serpapi.com/)
+  - Use case: Analyze top-performing ads and search trends in your niche
+
+- **Jina AI API**: Content reading and processing for analyzing documents and web pages
+  - Get it from [Jina AI](https://jina.ai/)
+  - Use case: Parse and understand competitor marketing materials
+
+### Cache (Optional)
+
+For improved performance and reduced API costs:
+
+```env
+UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url_here
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token_here
+```
+
+- **Upstash Redis**: Serverless Redis for caching API responses
+  - Get it from [Upstash Console](https://console.upstash.com/)
+  - Use case: Cache generated ads and research results to avoid redundant API calls
 
 ## Deployment
 
