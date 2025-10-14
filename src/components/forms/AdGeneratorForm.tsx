@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import { GenerateAdRequest, AdContent, AIProvider } from '@/types';
+import { AdContent, AIProvider } from '@/types';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Brand name must be at least 2 characters'),

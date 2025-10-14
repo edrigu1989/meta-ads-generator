@@ -19,7 +19,7 @@ export function AdPreview({ ad, provider }: AdPreviewProps) {
       setCopiedField(field);
       toast.success(`${field} copied to clipboard!`);
       setTimeout(() => setCopiedField(null), 2000);
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy to clipboard');
     }
   };
