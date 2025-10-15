@@ -130,18 +130,16 @@ export async function setCachedResearch(
       cached: false,
     };
 
+    // Use SETEX to set value with expiration in one command
+    // Format: /setex/{key}/{seconds}/{value}
+    const encodedValue = encodeURIComponent(JSON.stringify(dataToCache));
+
     const response = await fetch(
-      `${process.env.UPSTASH_REDIS_REST_URL}/set/${key}`,
+      `${process.env.UPSTASH_REDIS_REST_URL}/setex/${key}/${CACHE_TTL}/${encodedValue}`,
       {
-        method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          value: JSON.stringify(dataToCache),
-          ex: CACHE_TTL, // Set expiration time
-        }),
       }
     );
 
