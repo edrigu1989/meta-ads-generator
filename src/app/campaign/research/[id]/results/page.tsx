@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { ResearchResult } from '@/types/research';
 import { toast } from 'sonner';
 import { formatCacheAge } from '@/lib/cache/redis-client';
+import DarkModeToggle from '@/components/DarkModeToggle';
 
 export default function ResearchResultsPage() {
   const router = useRouter();
@@ -180,6 +181,30 @@ export default function ResearchResultsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
+        {/* Top Bar with Back Button and Dark Mode Toggle */}
+        <div className="flex justify-between items-center">
+          <button
+          onClick={() => router.push('/campaign/research')}
+          className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors group"
+        >
+          <svg
+            className="w-5 h-5 transform group-hover:-translate-x-1 transition-transform"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          <span className="font-medium">Volver a Nueva Investigación</span>
+        </button>
+          <DarkModeToggle />
+        </div>
+
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex flex-wrap items-center justify-center gap-3">

@@ -65,6 +65,59 @@ function isValidUrl(url: string): boolean {
 }
 
 /**
+ * Detect language based on location
+ */
+function getLanguageFromLocation(location?: string): string {
+  if (!location) return 'English';
+
+  const loc = location.toLowerCase();
+
+  // Spanish-speaking countries
+  if (
+    loc.includes('argentina') ||
+    loc.includes('spain') ||
+    loc.includes('españa') ||
+    loc.includes('mexico') ||
+    loc.includes('colombia') ||
+    loc.includes('chile') ||
+    loc.includes('peru') ||
+    loc.includes('venezuela') ||
+    loc.includes('ecuador') ||
+    loc.includes('guatemala') ||
+    loc.includes('cuba') ||
+    loc.includes('bolivia') ||
+    loc.includes('dominican') ||
+    loc.includes('honduras') ||
+    loc.includes('paraguay') ||
+    loc.includes('salvador') ||
+    loc.includes('nicaragua') ||
+    loc.includes('costa rica') ||
+    loc.includes('panama') ||
+    loc.includes('uruguay')
+  ) {
+    return 'Spanish';
+  }
+
+  // Portuguese-speaking countries
+  if (loc.includes('brazil') || loc.includes('brasil') || loc.includes('portugal')) {
+    return 'Portuguese';
+  }
+
+  // French-speaking countries
+  if (loc.includes('france') || loc.includes('canada') || loc.includes('belgium')) {
+    return 'French';
+  }
+
+  // German-speaking countries
+  if (loc.includes('germany') || loc.includes('austria') || loc.includes('switzerland')) {
+    return 'German';
+  }
+
+  // Default to English
+  return 'English';
+}
+
+/**
  * Scrape website content using Firecrawl
  *
  * @param url - Website URL to scrape
@@ -138,9 +191,13 @@ export async function scrapeWebsite(
  * Extract brand information from markdown content using Claude
  *
  * @param markdown - Website content in markdown format
+ * @param location - Geographic location for language detection
  * @returns BrandResearch object with extracted information
  */
-export async function extractBrandInfo(markdown: string): Promise<BrandResearch> {
+export async function extractBrandInfo(
+  markdown: string,
+  location?: string
+): Promise<BrandResearch> {
   console.log(
     `[Firecrawl] Extracting brand info from ${markdown.length} chars of markdown`
   );
@@ -149,10 +206,18 @@ export async function extractBrandInfo(markdown: string): Promise<BrandResearch>
     throw new Error('Markdown content is empty');
   }
 
+  const language = getLanguageFromLocation(location);
+  console.log(`[Firecrawl] Using language: ${language} for location: ${location}`);
+
   const client = getClaudeClient();
 
   try {
-    const prompt = `Analyze this website content and extract brand information. Return ONLY a JSON object with this exact structure (no markdown, no code blocks):
+    const languageInstruction =
+      language !== 'English'
+        ? `\n\nIMPORTANT: Respond in ${language}. All text fields (valueProposition, differentiators, productCategories, targetMarkets) must be in ${language}.`
+        : '';
+
+    const prompt = `Analyze this website content and extract brand information. Return ONLY a JSON object with this exact structure (no markdown, no code blocks):${languageInstruction}
 
 {
   "name": "brand name",
@@ -222,17 +287,21 @@ Analyze the language, messaging, and content to determine these accurately.`;
  * Complete brand research workflow: scrape + extract
  *
  * @param url - Website URL to analyze
+ * @param location - Geographic location for language detection
  * @returns Complete BrandResearch object
  */
-export async function researchBrand(url: string): Promise<BrandResearch> {
+export async function researchBrand(
+  url: string,
+  location?: string
+): Promise<BrandResearch> {
   console.log(`[Firecrawl] Starting complete brand research for: ${url}`);
 
   try {
     // Step 1: Scrape website
     const markdown = await scrapeWebsite(url);
 
-    // Step 2: Extract brand info
-    const brandInfo = await extractBrandInfo(markdown);
+    // Step 2: Extract brand info with location for language detection
+    const brandInfo = await extractBrandInfo(markdown, location);
 
     console.log(`[Firecrawl] Brand research completed for: ${brandInfo.name}`);
     return brandInfo;

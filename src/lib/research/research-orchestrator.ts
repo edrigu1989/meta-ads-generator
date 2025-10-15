@@ -54,12 +54,16 @@ export async function runResearch(
   }
 
   try {
+    // Use provided location or extract from URL as fallback
+    const location = input.location || extractLocation(input.url);
+    console.log(`[Orchestrator] Using location: ${location} for research and language`);
+
     // Step 1: Brand Research (Firecrawl + Claude)
     console.log('[Orchestrator] Step 1/3: Analyzing brand website...');
     let brandResearch: BrandResearch;
 
     try {
-      brandResearch = await researchBrand(input.url);
+      brandResearch = await researchBrand(input.url, location);
       console.log(`[Orchestrator] Brand research completed: ${brandResearch.name}`);
     } catch (error) {
       console.error('[Orchestrator] Brand research failed:', error);
@@ -70,10 +74,6 @@ export async function runResearch(
 
     // Step 2 & 3: Market Research (SerpAPI) - Run in parallel
     console.log('[Orchestrator] Step 2-3/3: Conducting market research...');
-
-    // Use provided location or extract from URL as fallback
-    const location = input.location || extractLocation(input.url);
-    console.log(`[Orchestrator] Using location: ${location}`);
 
     let competitors: CompetitorResult[] = [];
     let trends: TrendData = {
