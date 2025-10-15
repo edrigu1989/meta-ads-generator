@@ -63,6 +63,7 @@ export async function getCachedResearch(url: string): Promise<ResearchResult | n
     }
 
     const data = await response.json();
+    console.log('[Cache] Raw response from Redis:', JSON.stringify(data, null, 2));
 
     if (!data.result) {
       console.log('[Cache] Cache miss');
@@ -70,7 +71,22 @@ export async function getCachedResearch(url: string): Promise<ResearchResult | n
     }
 
     // Parse cached data
-    const cachedData = JSON.parse(data.result) as ResearchResult;
+    // Upstash returns the stored value directly in result
+    console.log('[Cache] Parsing result, type:', typeof data.result);
+
+    let cachedData: ResearchResult;
+
+    // Check if result is already an object (shouldn't happen with GET)
+    // or if it's a stringified JSON
+    if (typeof data.result === 'string') {
+      cachedData = JSON.parse(data.result) as ResearchResult;
+    } else {
+      // If it's already an object, use it directly
+      cachedData = data.result as ResearchResult;
+    }
+
+    console.log('[Cache] Parsed data keys:', Object.keys(cachedData));
+    console.log('[Cache] Has brand?:', !!cachedData.brand);
 
     // Check if cache is still valid (within TTL)
     const cachedTime = new Date(cachedData.timestamp).getTime();

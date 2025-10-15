@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { runResearch } from '@/lib/research/research-orchestrator';
-import { ResearchInput } from '@/types/research';
+import { ResearchInput, ResearchResult } from '@/types/research';
 
 /**
  * Request validation schema
@@ -38,6 +38,27 @@ function validateEnvironment(): { valid: boolean; missing: string[] } {
     valid: missing.length === 0,
     missing,
   };
+}
+
+/**
+ * Ensure result is properly formatted ResearchResult object
+ * Handles cases where cache might return wrapped data
+ */
+function ensureResearchResult(data: unknown): ResearchResult {
+  // If data has 'value' property (Upstash metadata leak), extract it
+  if (
+    data &&
+    typeof data === 'object' &&
+    'value' in data &&
+    typeof (data as Record<string, unknown>).value === 'string'
+  ) {
+    console.log('[Research API] Detected wrapped data, extracting value');
+    const wrappedData = data as { value: string };
+    return JSON.parse(wrappedData.value) as ResearchResult;
+  }
+
+  // If it's already a proper ResearchResult, return it
+  return data as ResearchResult;
 }
 
 /**
@@ -105,6 +126,16 @@ export async function POST(request: NextRequest) {
     let result;
     try {
       result = await runResearch(researchInput, validatedData.forceRefresh);
+      console.log('[Research API] Result type:', typeof result);
+      console.log('[Research API] Result keys:', Object.keys(result));
+      console.log('[Research API] Has brand?:', !!result.brand);
+      console.log('[Research API] Result structure check:', {
+        hasBrand: !!result.brand,
+        hasCompetitors: !!result.competitors,
+        hasMarket: !!result.market,
+        hasAudience: !!result.audience,
+        cached: result.cached,
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
@@ -159,13 +190,24 @@ export async function POST(request: NextRequest) {
 
     // 5. Return successful result
     const duration = Date.now() - startTime;
+
+    // Ensure result is properly formatted (handle cache metadata leaks)
+    const cleanResult = ensureResearchResult(result);
+
     console.log(`[Research API] Research completed successfully in ${duration}ms`);
-    console.log(`[Research API] Quality score: ${result.qualityScore}/100`);
+    console.log(`[Research API] Quality score: ${cleanResult.qualityScore}/100`);
+    console.log('[Research API] Final result structure:', {
+      hasBrand: !!cleanResult.brand,
+      hasCompetitors: !!cleanResult.competitors,
+      hasMarket: !!cleanResult.market,
+      hasAudience: !!cleanResult.audience,
+      cached: cleanResult.cached,
+    });
 
     return NextResponse.json(
       {
         success: true,
-        data: result,
+        data: cleanResult,
         duration,
       },
       { status: 200 }
