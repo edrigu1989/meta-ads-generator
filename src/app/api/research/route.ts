@@ -63,13 +63,18 @@ export async function POST(request: NextRequest) {
 
     // 2. Parse and validate request body
     const body = await request.json();
+    console.log('[Research API] Received request body:', JSON.stringify(body, null, 2));
 
     let validatedData;
     try {
       validatedData = ResearchRequestSchema.parse(body);
+      console.log('[Research API] Validation successful:', JSON.stringify(validatedData, null, 2));
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error('[Research API] Validation error:', error.issues);
+        console.error('[Research API] Validation failed!');
+        console.error('[Research API] Validation errors:', JSON.stringify(error.issues, null, 2));
+        console.error('[Research API] Received data:', JSON.stringify(body, null, 2));
+
         return NextResponse.json(
           {
             success: false,
@@ -77,6 +82,7 @@ export async function POST(request: NextRequest) {
             details: error.issues.map((err) => ({
               field: err.path.join('.'),
               message: err.message,
+              received: err.path.length > 0 ? body[err.path[0]] : body,
             })),
             duration: Date.now() - startTime,
           },

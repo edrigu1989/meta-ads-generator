@@ -35,9 +35,9 @@ const PRODUCT_TYPES = [
 ];
 
 const CAMPAIGN_GOALS = [
-  { value: 'awareness', label: 'Awareness - Dar a conocer marca' },
-  { value: 'leads', label: 'Leads - Generar contactos' },
-  { value: 'sales', label: 'Sales - Vender producto/servicio' },
+  { value: 'competitor-analysis', label: 'Análisis de Competencia' },
+  { value: 'market-trends', label: 'Tendencias de Mercado' },
+  { value: 'audience-insights', label: 'Insights de Audiencia' },
   { value: 'full-research', label: 'Análisis Completo' },
 ];
 
@@ -65,7 +65,8 @@ export default function ResearchPage() {
     });
 
     try {
-      console.log('[Research Page] Submitting:', data);
+      console.log('[Research Page] Form data:', JSON.stringify(data, null, 2));
+      console.log('[Research Page] Submitting to /api/research...');
 
       const response = await fetch('/api/research', {
         method: 'POST',
@@ -76,12 +77,15 @@ export default function ResearchPage() {
       });
 
       const result = await response.json();
+      console.log('[Research Page] Response status:', response.status);
+      console.log('[Research Page] Response data:', JSON.stringify(result, null, 2));
 
       if (!response.ok) {
+        console.error('[Research Page] Request failed:', result);
         throw new Error(result.error || 'Error al realizar la investigación');
       }
 
-      console.log('[Research Page] Success:', result);
+      console.log('[Research Page] Success!');
 
       // Dismiss loading toast
       toast.dismiss(loadingToast);
