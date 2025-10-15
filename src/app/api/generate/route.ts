@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerateAdRequest, GenerateAdResponse } from '@/types';
+import { ResearchResult } from '@/types/research';
 import { createAdPrompt } from '@/lib/prompts/ad-prompts';
 import { generateWithClaude } from '@/lib/ai/providers/claude';
 import { generateWithOpenAI } from '@/lib/ai/providers/openai';
@@ -7,7 +8,8 @@ import { generateWithGemini } from '@/lib/ai/providers/gemini';
 
 export async function POST(request: NextRequest) {
   try {
-    const body: GenerateAdRequest = await request.json();
+    const body: GenerateAdRequest & { researchData?: ResearchResult } =
+      await request.json();
 
     // Validate required fields
     if (!body.name || !body.product || !body.targetAudience || !body.keyBenefits) {
@@ -20,8 +22,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create prompt
-    const prompt = createAdPrompt(body);
+    // Log if research data is included
+    if (body.researchData) {
+      console.log('[Generate API] Using research-powered generation');
+      console.log(
+        `[Generate API] Research quality score: ${body.researchData.qualityScore}/100`
+      );
+    } else {
+      console.log('[Generate API] Using standard generation (no research)');
+    }
+
+    // Create prompt with optional research data
+    const prompt = createAdPrompt(body, body.researchData);
 
     // Generate with selected AI provider
     let adContent;

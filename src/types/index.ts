@@ -4,6 +4,9 @@ export interface AdContent {
   hook: string;
   body: string;
   cta: string;
+  reasoning?: string;
+  researchInsight?: string;
+  competitorGap?: string;
 }
 
 export interface BrandInfo {

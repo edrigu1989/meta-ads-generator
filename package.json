@@ -12,6 +12,7 @@
     "@anthropic-ai/sdk": "^0.65.0",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
+    "@mendable/firecrawl-js": "^4.4.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.545.0",
     "next": "14.2.33",
@@ -20,6 +21,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.65.0",
+    "serpapi": "^2.2.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "zod": "^4.1.12"
