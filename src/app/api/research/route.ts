@@ -120,7 +120,10 @@ export async function POST(request: NextRequest) {
       url: validatedData.websiteUrl,
       productType: validatedData.productType,
       objective: validatedData.campaignGoal,
+      location: validatedData.location,
     };
+
+    console.log('[Research API] Research location:', validatedData.location);
 
     // 4. Execute research workflow
     let result;

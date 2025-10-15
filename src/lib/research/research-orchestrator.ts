@@ -71,7 +71,10 @@ export async function runResearch(
     // Step 2 & 3: Market Research (SerpAPI) - Run in parallel
     console.log('[Orchestrator] Step 2-3/3: Conducting market research...');
 
-    const location = extractLocation(input.url);
+    // Use provided location or extract from URL as fallback
+    const location = input.location || extractLocation(input.url);
+    console.log(`[Orchestrator] Using location: ${location}`);
+
     let competitors: CompetitorResult[] = [];
     let trends: TrendData = {
       keyword: input.productType,

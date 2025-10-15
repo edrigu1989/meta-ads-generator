@@ -15,6 +15,8 @@ export interface ResearchInput {
   productType: string;
   /** Primary objective of the research (e.g., "competitor analysis", "market trends", "audience insights") */
   objective: 'competitor-analysis' | 'market-trends' | 'audience-insights' | 'full-research';
+  /** Geographic location for market research (e.g., "USA", "Argentina", "United Kingdom") */
+  location?: string;
 }
 
 /**
