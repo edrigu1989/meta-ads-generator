@@ -39,6 +39,22 @@ export interface PainPoint {
 }
 
 /**
+ * SerpAPI response structure (subset of fields we use)
+ */
+interface SerpApiResponse {
+  organic_results?: Array<{
+    link?: string;
+    title?: string;
+    snippet?: string;
+    description?: string;
+  }>;
+  related_searches?: Array<{
+    query?: string;
+    text?: string;
+  }>;
+}
+
+/**
  * Get SerpAPI key from environment
  */
 function getSerpApiKey(): string {
@@ -119,7 +135,8 @@ export async function searchCompetitors(
     });
 
     // Extract organic results
-    const organicResults = (results as any).organic_results || [];
+    const serpResponse = results as SerpApiResponse;
+    const organicResults = serpResponse.organic_results || [];
     const competitors: CompetitorResult[] = [];
 
     for (let i = 0; i < Math.min(5, organicResults.length); i++) {
@@ -176,10 +193,11 @@ export async function getMarketTrends(keyword: string): Promise<TrendData> {
       return response;
     });
 
-    const related = (relatedSearches as any).related_searches || [];
+    const serpRelatedResponse = relatedSearches as SerpApiResponse;
+    const related = serpRelatedResponse.related_searches || [];
     const relatedQueries = related
-      .map((item: any) => item.query || item.text)
-      .filter(Boolean)
+      .map((item) => item.query || item.text)
+      .filter((query): query is string => Boolean(query))
       .slice(0, 10);
 
     // Search for trending topics
@@ -196,7 +214,8 @@ export async function getMarketTrends(keyword: string): Promise<TrendData> {
       return response;
     });
 
-    const organicResults = (trendSearches as any).organic_results || [];
+    const serpTrendResponse = trendSearches as SerpApiResponse;
+    const organicResults = serpTrendResponse.organic_results || [];
     const risingTopics: string[] = [];
 
     // Extract keywords from trending search results
@@ -206,7 +225,7 @@ export async function getMarketTrends(keyword: string): Promise<TrendData> {
         const words = result.title
           .toLowerCase()
           .split(/\s+/)
-          .filter((word: string) => word.length > 4)
+          .filter((word) => word.length > 4)
           .slice(0, 3);
         risingTopics.push(...words);
       }
@@ -269,7 +288,8 @@ export async function searchPainPoints(product: string): Promise<PainPoint[]> {
           return response;
         }, 2); // Fewer retries per query to avoid rate limits
 
-        const organicResults = (results as any).organic_results || [];
+        const serpPainResponse = results as SerpApiResponse;
+        const organicResults = serpPainResponse.organic_results || [];
 
         for (const result of organicResults) {
           if (result.snippet && result.link) {
@@ -285,7 +305,8 @@ export async function searchPainPoints(product: string): Promise<PainPoint[]> {
         // Small delay between queries to avoid rate limits
         await sleep(500);
       } catch (error) {
-        console.warn(`[SerpAPI] Query "${query}" failed, continuing...`);
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        console.warn(`[SerpAPI] Query "${query}" failed: ${errorMsg}, continuing...`);
         // Continue with other queries even if one fails
       }
     }

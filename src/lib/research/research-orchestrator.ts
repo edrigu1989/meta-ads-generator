@@ -108,7 +108,10 @@ export async function runResearch(
 
       console.log('[Orchestrator] Market research completed');
     } catch (error) {
-      console.warn('[Orchestrator] Some market research failed, continuing with partial data');
+      console.warn(
+        '[Orchestrator] Some market research failed, continuing with partial data:',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
     }
 
     // Step 4: Compile Results
@@ -126,7 +129,7 @@ export async function runResearch(
         commonMessages: extractCommonMessages(competitors),
         opportunities: identifyOpportunities(brandResearch, competitors),
         pricingStrategies: [],
-        uniqueAngles: suggestUniqueAngles(brandResearch, competitors),
+        uniqueAngles: suggestUniqueAngles(brandResearch),
       },
       market: {
         trends: trends.risingTopics.map((topic) => ({
@@ -261,10 +264,7 @@ function identifyOpportunities(
   return opportunities.slice(0, 5);
 }
 
-function suggestUniqueAngles(
-  brand: BrandResearch,
-  competitors: CompetitorResult[]
-): string[] {
+function suggestUniqueAngles(brand: BrandResearch): string[] {
   const angles: string[] = [];
 
   angles.push(`Focus on "${brand.valueProposition}"`);

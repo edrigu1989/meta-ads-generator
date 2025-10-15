@@ -69,12 +69,12 @@ export async function POST(request: NextRequest) {
       validatedData = ResearchRequestSchema.parse(body);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error('[Research API] Validation error:', error.errors);
+        console.error('[Research API] Validation error:', error.issues);
         return NextResponse.json(
           {
             success: false,
             error: 'Invalid request data',
-            details: error.errors.map((err) => ({
+            details: error.issues.map((err) => ({
               field: err.path.join('.'),
               message: err.message,
             })),

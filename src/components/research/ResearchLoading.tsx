@@ -59,7 +59,7 @@ export default function ResearchLoading({ currentStep = 0 }: ResearchLoadingProp
       clearTimeout(timer);
       clearInterval(progressInterval);
     };
-  }, [currentStep]);
+  }, [currentStep, progress]);
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
@@ -112,7 +112,6 @@ export default function ResearchLoading({ currentStep = 0 }: ResearchLoadingProp
         {RESEARCH_STEPS.map((step) => {
           const isCompleted = activeStep > step.id;
           const isActive = activeStep === step.id;
-          const isPending = activeStep < step.id;
 
           return (
             <div
